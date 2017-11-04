@@ -1,1 +1,1 @@
-# JavaCouse
+# JavaCourse
