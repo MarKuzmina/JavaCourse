@@ -26,8 +26,11 @@ public class CalculatorWindow extends JFrame {
     public  char operation;
     private String login;
     private CalculatorHistory history;
+    private Calculate calc;
+    private MyCache myCache;
 
     public CalculatorWindow(String _login) {
+        myCache = new MyCache();
         login = _login;
         windowFrame2 = new JFrame("Calculator");
         windowFrame2.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -144,7 +147,7 @@ public class CalculatorWindow extends JFrame {
         calculateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String str = resultTextField.getText();
-                Calculate calc = new Calculate(str, operation);
+                calc = new Calculate(str,myCache);
                 history.createAndWriteLog(str);
                 String S1 = Double.toString(calc.fCalculate());
                 resultTextField.setText(S1);
