@@ -26,47 +26,52 @@ public class MyCache {
         }
     }
 
-    private int inCacheL1(Operation operation)
+    public boolean inCacheL1(Operation operation)
     {
         for(int i=0;i<CacheL1.size();i++)
         {
             if (CacheL1.get(i).hashCode()==operation.hashCode())
-                return CacheL1.indexOf(operation);
+                return true;
         }
-        return -1;
+        return false;
     }
 
-    private int inCacheL2(Operation operation)
+    public boolean inCacheL2(Operation operation)
     {
         for(int i=0;i<CacheL2.size();i++)
         {
             if (CacheL2.get(i).equals(operation))
-                return CacheL2.indexOf(operation);
+                return true;
         }
-        return -1;
+        return false;
     }
 
     public double GetResult(Operation operation)
     {
-        int index = inCacheL1(operation);
+        int index = -1;
+        for(int i=0;i<CacheL1.size();i++)
+        {
+            if (CacheL1.get(i).hashCode()==operation.hashCode())
+                index = CacheL1.indexOf(operation);
+        }
+
         if (index>=0) {
             System.out.println("CONTAINS IN L1");
             return (CacheL1.get(index).result);
         }
         else
         {
-            index = inCacheL2(operation);
+            for(int i=0;i<CacheL2.size();i++)
+            {
+                if (CacheL2.get(i).equals(operation))
+                    index = CacheL2.indexOf(operation);
+            }
+
             if (index>=0) {
                 System.out.println("CONTAINS IN L2");
                 return (CacheL2.get(index).result);
             }
-            else    //если не содержится ни в одном из уровней кэша:
-            {
-                System.out.println("Cache NOT contains this operation!");
-                Add(operation);
-                return operation.result;
-            }
         }
-
+        return -999;
     }
 }

@@ -25,9 +25,9 @@ public class CalculatorWindow extends JFrame {
     private JButton pointButton;
     public  char operation;
     private String login;
-    private CalculatorHistory history;
     private Calculate calc;
     private MyCache myCache;
+    private LogThread logThread;
 
     public CalculatorWindow(String _login) {
         myCache = new MyCache();
@@ -62,7 +62,6 @@ public class CalculatorWindow extends JFrame {
         numeral9Button = new MyButton(windowFrame2, "9", 80, 50, 194, 240);
         numeral0Button = new MyButton(windowFrame2, "0", 170, 50, 10, 300);
         pointButton = new MyButton(windowFrame2, ".", 80, 50, 194, 300);
-        history = new CalculatorHistory(login);
 
 
         numeral0Button.addActionListener(new ActionListener() {
@@ -148,7 +147,8 @@ public class CalculatorWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String str = resultTextField.getText();
                 calc = new Calculate(str,myCache);
-                history.createAndWriteLog(str);
+                logThread = new LogThread(login,str);
+                logThread.start();
                 String S1 = Double.toString(calc.fCalculate());
                 resultTextField.setText(S1);
             }

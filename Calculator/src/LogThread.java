@@ -1,17 +1,27 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CalculatorHistory {
+public class LogThread extends Thread {
     private String login;
-    public File logFile;
-    public int lineCount = 0;
-    public int fileCount = 0;
+    public static File logFile;
+    private static boolean isFileExist = false;
+    private String printStr;
+    public static int lineCount = 0;
+    public static int fileCount = 0;
 
+    LogThread(String login, String str)
+    {
+        this.login = login;
+        printStr = str;
+        //
+    }
 
-    public CalculatorHistory(String _login) {
-        login = _login;
-        createFile("calc.log");
+    @Override
+    public void run() {
+        createAndWriteLog(printStr);
     }
 
     private void createFile(String name)
@@ -39,7 +49,12 @@ public class CalculatorHistory {
         Date dateNow = new Date();
         SimpleDateFormat formatForDateNow = new SimpleDateFormat("E yyyy.MM.dd 'и время' hh:mm:ss a zzz");
         try {
-            String data = System.getProperty("line.separator") + login + "\t" + str + "\t" + formatForDateNow.format(dateNow);
+            if(!isFileExist)
+            {
+                createFile("calc.log");
+                isFileExist = true;
+            }
+            //String data = System.getProperty("line.separator") + login + "\t" + str + "\t" + formatForDateNow.format(dateNow);
             FileWriter writer = new FileWriter(logFile.getPath(), true);
             writer.append(System.getProperty("line.separator") + login + "\t" + str + "\t" + formatForDateNow.format(dateNow));
             lineCount++;
@@ -49,7 +64,6 @@ public class CalculatorHistory {
                 fileCount++;
                 logFile.renameTo(new File("C:\\GitProject\\JavaCourse\\Calculator\\calc.log"+ fileCount + ".txt"));
                 createFile("calc.log");
-
             }
         } catch (IOException e) {
             e.printStackTrace();
