@@ -6,7 +6,7 @@ public class Operation {
         Sum, Difference, Multiplication, Division
     }
     public  double result;
-    private operation myOperation;
+    public operation myOperation;
     Operation(double _operand1, double _operand2, char _operation){
         operand1 = _operand1;
         operand2 = _operand2;
@@ -54,5 +54,14 @@ public class Operation {
         result1 = 31 * result1 + (int) (temp ^ (temp >>> 32));
         result1 = 31 * result1 + (myOperation != null ? myOperation.hashCode() : 0);
         return result1;
+    }
+
+    @Override
+    public String toString() {
+        return "Operation{" +
+                "a" + operand1 +
+                ", b=" + operand2 +
+                ", Operation=" + myOperation +
+                '}';
     }
 }

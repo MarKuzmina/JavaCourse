@@ -9,14 +9,13 @@ public class LogThread extends Thread {
     public static File logFile;
     private static boolean isFileExist = false;
     private String printStr;
-    public static int lineCount = 0;
+    public static int lineCount = 1;
     public static int fileCount = 0;
 
     LogThread(String login, String str)
     {
         this.login = login;
         printStr = str;
-        //
     }
 
     @Override
@@ -54,13 +53,13 @@ public class LogThread extends Thread {
                 createFile("calc.log");
                 isFileExist = true;
             }
-            //String data = System.getProperty("line.separator") + login + "\t" + str + "\t" + formatForDateNow.format(dateNow);
             FileWriter writer = new FileWriter(logFile.getPath(), true);
             writer.append(System.getProperty("line.separator") + login + "\t" + str + "\t" + formatForDateNow.format(dateNow));
             lineCount++;
             writer.close();
             if ((lineCount%10)==0)
             {
+                lineCount = 0;
                 fileCount++;
                 logFile.renameTo(new File("C:\\GitProject\\JavaCourse\\Calculator\\calc.log"+ fileCount + ".txt"));
                 createFile("calc.log");

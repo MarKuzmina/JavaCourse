@@ -31,8 +31,8 @@ public class SignIn {
         }
     }
 
-    public  void signIn() {
-
+    public  boolean signIn() {
+        boolean result = false;
         String loginFile;
         String passwordFile;
 
@@ -42,20 +42,20 @@ public class SignIn {
             BufferedReader reader = new BufferedReader(fr);
             loginFile = reader.readLine();
             passwordFile = reader.readLine();
-            //System.out.println(loginFile);
-            // System.out.println(passwordFile);
 
             if (loginFile.equals(login) && passwordFile.equals(password)) {
-                new CalculatorWindow(login);
+                result = true;
+                //new CalculatorWindow(login);
             }
             else {
-                JOptionPane.showMessageDialog(null, "Неверный логин или пароль");
+                result = false;//JOptionPane.showMessageDialog(null, "Неверный логин или пароль");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
     }
 }
 

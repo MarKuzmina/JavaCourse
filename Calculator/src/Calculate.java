@@ -1,21 +1,38 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
 public class Calculate {
     public String str;
     public double[] arrayNumber;
     public  char [] arraySymbol;
     public MyCache myCache;
     public int numberCount;
+    private Socket socket;
+    private DataOutputStream dataOS;
+    private DataInputStream dataIS;
 
-    Calculate(String _str, MyCache cache){
-        str = _str;
-        numberCount = 0;
-        for (int i = 0; i < str.length(); i++){
-            if (str.charAt(i) == '+' || str.charAt(i) == '-' || str.charAt(i) == '*' || str.charAt(i) == '/'){
-                numberCount++;
+    Calculate(String _str, MyCache cache,Socket _socket){
+        socket = _socket;
+        try {
+            dataOS = new DataOutputStream(socket.getOutputStream());
+            dataIS = new DataInputStream(socket.getInputStream());
+            str = _str;
+            numberCount = 0;
+            for (int i = 0; i < str.length(); i++) {
+                if (str.charAt(i) == '+' || str.charAt(i) == '-' || str.charAt(i) == '*' || str.charAt(i) == '/') {
+                    numberCount++;
+                }
             }
+            arrayNumber = new double[numberCount + 1];
+            arraySymbol = new char[numberCount];
+            myCache = cache;
         }
-        arrayNumber = new double[numberCount + 1];
-        arraySymbol = new char[numberCount];
-        myCache = cache;
+        catch (IOException exception)
+        {
+            exception.printStackTrace();
+        }
     }
 
 
@@ -34,20 +51,6 @@ public class Calculate {
             }
         }
         arrayNumber[count] = Double.parseDouble(str.toString());
-
-
-
-       /*
-        System.out.print("Numbers: ");
-        for(int i=0;i<numberCount+1;i++)
-            System.out.print(arrayNumber[i] + " ");
-        System.out.println("Operations: ");
-        for(int i=0;i<numberCount;i++)
-            System.out.print(arraySymbol[i] + " ");
-       */
-
-
-
     }
 
     public void makeOperation (char operation1, char operation2)
@@ -80,7 +83,35 @@ public class Calculate {
                 resultOperation = myCache.GetResult(currentOperation);
             else
             {
-                resultOperation = currentOperation.result;
+                resultOperation = 0;
+                try {
+                    dataOS.writeBoolean(true);
+                    dataOS.writeDouble(currentOperation.operand1);
+                    System.out.println("a = " +currentOperation.operand1);
+                    dataOS.writeDouble(currentOperation.operand2);
+                    System.out.println("b = " +currentOperation.operand2);
+                    System.out.println("op = " +currentOperation.myOperation);
+                    switch (currentOperation.myOperation) {
+                        case Sum:
+                            dataOS.writeChar('+');
+                            break;
+                        case Difference:
+                            dataOS.writeChar('-');
+                            break;
+                        case Multiplication:
+                            dataOS.writeChar('*');
+                            break;
+                        case Division:
+                            dataOS.writeChar('/');
+                            break;
+                    }
+                    resultOperation = dataIS.readDouble();
+                    //dataOS.writeBoolean(true);
+                }
+                catch (IOException exception)
+                {
+                    exception.printStackTrace();
+                }
             }
             if (currentOperation != null) {
                 arrayNumber[operationIndex + 1] = resultOperation;
@@ -103,19 +134,6 @@ public class Calculate {
                     operationIndex = -1;
                 }
             }
-
-
-           /*
-            System.out.println("After OPERATION: ");
-            System.out.print("Numbers: ");
-            for (int i = 0; i < numberCount + 1; i++)
-                System.out.print(arrayNumber[i] + " ");
-            System.out.println("Operations: ");
-            for (int i = 0; i < numberCount; i++)
-                System.out.print(arraySymbol[i] + " ");
-                */
-
-
         }
     }
 

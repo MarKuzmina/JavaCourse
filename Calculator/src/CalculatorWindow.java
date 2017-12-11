@@ -1,6 +1,9 @@
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class CalculatorWindow extends JFrame {
     private JFrame windowFrame2;
@@ -28,12 +31,31 @@ public class CalculatorWindow extends JFrame {
     private Calculate calc;
     private MyCache myCache;
     private LogThread logThread;
+    private Socket socket;
 
-    public CalculatorWindow(String _login) {
+    public CalculatorWindow(String _login, Socket _socket) {
+        socket = _socket;
         myCache = new MyCache();
         login = _login;
         windowFrame2 = new JFrame("Calculator");
-        windowFrame2.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        //windowFrame2.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        windowFrame2.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        windowFrame2.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                try
+                {
+                    DataOutputStream dataOS = new DataOutputStream(socket.getOutputStream());
+                    dataOS.writeBoolean(false);   //send thar calculator is close! (isOpen = false)
+                    windowFrame2.dispose();
+                }
+                catch (IOException exception)
+                {
+                    exception.printStackTrace();
+                }
+            }
+        });
         windowFrame2.setSize(width, height);
         windowFrame2.setLocationRelativeTo(null);
         windowFrame2.setResizable(false);
@@ -145,14 +167,24 @@ public class CalculatorWindow extends JFrame {
         });
         calculateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /*try
+                {
+                    DataOutputStream dataOS = new DataOutputStream(socket.getOutputStream());
+                    dataOS.writeBoolean(true);   //send thar calculator is open!
+                }
+                catch (IOException exception)
+                {
+                    exception.printStackTrace();
+                }*/
                 String str = resultTextField.getText();
-                calc = new Calculate(str,myCache);
-                logThread = new LogThread(login,str);
-                logThread.start();
+                calc = new Calculate(str, myCache, socket);
+                //logThread = new LogThread(login, str);
+                //logThread.start();
                 String S1 = Double.toString(calc.fCalculate());
                 resultTextField.setText(S1);
             }
         });
+
     }
 }
 
